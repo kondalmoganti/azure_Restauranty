@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: restauranty-km
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: restaurantykm2468.azurecr.io/restauranty-auth:latest
+        ports:
+        - containerPort: 3001
+        env:
+        - name: SECRET
+          value: "MySecret1!"
+        - name: MONGODB_URI
+          value: "mongodb://mongo:27017/flor"
+        - name: CLOUD_NAME
+          value: "ChangeMe"
+        - name: CLOUD_API_KEY
+          value: "ChangeMe"
+        - name: CLOUD_API_SECRET
+          value: "ChangeMe"
+        - name: PORT
+          value: "3001"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: restauranty-km
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 3001
+    targetPort: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discounts
+  namespace: restauranty-km
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discounts
+  template:
+    metadata:
+      labels:
+        app: discounts
+    spec:
+      containers:
+      - name: discounts
+        image: restaurantykm2468.azurecr.io/restauranty-discounts:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: SECRET
+          value: "MySecret1!"
+        - name: MONGODB_URI
+          value: "mongodb://mongo:27017/flor"
+        - name: CLOUD_NAME
+          value: "ChangeMe"
+        - name: CLOUD_API_KEY
+          value: "ChangeMe"
+        - name: CLOUD_API_SECRET
+          value: "ChangeMe"
+        - name: PORT
+          value: "3002"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discounts
+  namespace: restauranty-km
+spec:
+  selector:
+    app: discounts
+  ports:
+  - port: 3002
+    targetPort: 3002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: items
+  namespace: restauranty-km
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: items
+  template:
+    metadata:
+      labels:
+        app: items
+    spec:
+      containers:
+      - name: items
+        image: restaurantykm2468.azurecr.io/restauranty-items:latest
+        ports:
+        - containerPort: 3003
+        env:
+        - name: SECRET
+          value: "MySecret1!"
+        - name: MONGODB_URI
+          value: "mongodb://mongo:27017/flor"
+        - name: CLOUD_NAME
+          value: "ChangeMe"
+        - name: CLOUD_API_KEY
+          value: "ChangeMe"
+        - name: CLOUD_API_SECRET
+          value: "ChangeMe"
+        - name: PORT
+          value: "3003"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: items
+  namespace: restauranty-km
+spec:
+  selector:
+    app: items
+  ports:
+  - port: 3003
+    targetPort: 3003
