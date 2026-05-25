@@ -95,3 +95,4 @@ For the frontend, use the `REACT_APP_` prefix: `REACT_APP_API_URL=http://localho
 - **Monitoring**: Prometheus metrics (`/metrics` endpoint on each backend service)
 - **Routing**: HAProxy (local) / Kubernetes Ingress (production)
 - **Database**: MongoDB
+# azure_Restauranty
