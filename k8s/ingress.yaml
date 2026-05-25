@@ -3,8 +3,14 @@ kind: Ingress
 metadata:
   name: restauranty-ingress
   namespace: restauranty-km
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-restauranty
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - restauranty.kondal.online
+    secretName: restauranty-tls
   rules:
   - http:
       paths:
