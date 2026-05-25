@@ -1,0 +1,68 @@
+name: Restauranty CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  ACR_LOGIN_SERVER: restaurantykm2468.azurecr.io
+  RESOURCE_GROUP: rg-restauranty-km
+  AKS_CLUSTER: aks-restauranty-km
+  NAMESPACE: restauranty-km
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Docker Login to ACR
+        run: az acr login --name restaurantykm2468
+
+      - name: Build and push auth image
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/restauranty-auth:latest ./backend/auth
+          docker push $ACR_LOGIN_SERVER/restauranty-auth:latest
+
+      - name: Build and push discounts image
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/restauranty-discounts:latest ./backend/discounts
+          docker push $ACR_LOGIN_SERVER/restauranty-discounts:latest
+
+      - name: Build and push items image
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/restauranty-items:latest ./backend/items
+          docker push $ACR_LOGIN_SERVER/restauranty-items:latest
+
+      - name: Build and push frontend image
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/restauranty-client:latest ./client
+          docker push $ACR_LOGIN_SERVER/restauranty-client:latest
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group $RESOURCE_GROUP \
+            --name $AKS_CLUSTER \
+            --overwrite-existing
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/mongo.yaml
+          kubectl apply -f k8s/backend.yaml
+          kubectl apply -f k8s/frontend.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl rollout restart deployment/auth -n $NAMESPACE
+          kubectl rollout restart deployment/discounts -n $NAMESPACE
+          kubectl rollout restart deployment/items -n $NAMESPACE
+          kubectl rollout restart deployment/frontend -n $NAMESPACE
