@@ -1,98 +1,142 @@
-# Restauranty
+Restauranty – Cloud Native DevOps Project
 
-A restaurant management platform built with a **microservices architecture**: 3 Node.js/Express backends + a React frontend, unified behind HAProxy path-based routing.
+A production-style cloud-native microservices application deployed on Azure Kubernetes Service (AKS) with complete DevOps practices including:
 
-## Architecture
+Kubernetes orchestration
+Docker containerization
+GitHub Actions CI/CD
+Azure Container Registry (ACR)
+Monitoring with Prometheus & Grafana
+HTTPS using cert-manager & Let’s Encrypt
+Custom domain integration
+Live Application
+https://restauranty.kondal.online
+Architecture Overview
 
-```
-                         ┌────────────────────────┐
-                         │   HAProxy / Ingress    │
-    Browser ───────────► │       (port 80)        │
-                         └───────────┬────────────┘
-                                     │
-            ┌────────────────────────┼─────────────────────────┐
-            │                        │                         │
-       /api/auth/*             /api/items/*             /api/discounts/*
-            │                        │                         │
-   ┌────────▼────────┐     ┌─────────▼─────────┐    ┌─────────▼──────────┐
-   │  Auth Service   │     │  Items Service    │    │ Discounts Service  │
-   │   (port 3001)   │     │   (port 3003)     │    │   (port 3002)      │
-   └────────┬────────┘     └─────────┬─────────┘    └──────────┬─────────┘
-            │                        │                         │
-            └────────────────────────┼─────────────────────────┘
-                                     │
-                              ┌──────▼──────┐
-                              │   MongoDB   │
-                              │ (port 27017)│
-                              └─────────────┘
-```
+The application follows a microservices-based architecture deployed on Azure AKS.
 
-## Microservices
+Components
+Frontend
+React.js application
+Served through NGINX
+Accessible via HTTPS
+Backend Services
+Auth Service
+Items Service
+Discounts Service
+Database
+MongoDB running inside Kubernetes
+Infrastructure
+Azure Kubernetes Service (AKS)
+Azure Container Registry (ACR)
+NGINX Ingress Controller
+cert-manager
+Prometheus & Grafana
+Architecture Diagram
 
-| Service | Port | Path | Responsibilities |
-|---------|------|------|-----------------|
-| **Auth** | 3001 | `/api/auth/*` | User signup, login, JWT authentication |
-| **Discounts** | 3002 | `/api/discounts/*` | Coupon and campaign management |
-| **Items** | 3003 | `/api/items/*` | Menu items, dietary categories, orders |
-| **Frontend** | 3000 | `/` | React SPA (admin dashboard) |
+(Add your architecture image here)
 
-## Quick Start
+![Architecture](./screenshots/architecture.png)
+Tech Stack
+Category	Technology
+Cloud	Microsoft Azure
+Containerization	Docker
+Orchestration	Kubernetes (AKS)
+CI/CD	GitHub Actions
+Monitoring	Prometheus + Grafana
+Ingress	NGINX Ingress Controller
+SSL	cert-manager + Let’s Encrypt
+Frontend	React.js
+Backend	Node.js
+Database	MongoDB
+CI/CD Workflow
 
-### 1. Start MongoDB
+The CI/CD pipeline is implemented using GitHub Actions.
 
-```bash
-docker run -d \
-  --name my-mongo \
-  -p 27017:27017 \
-  -v mongo-data:/data/db \
-  mongo:latest
-```
+Workflow
+Developer pushes code to GitHub
+GitHub Actions pipeline starts
+Docker images are built
+Images pushed to Azure Container Registry
+Kubernetes manifests deployed to AKS
+Kubernetes Components
+Namespace
+kubectl get ns
 
-### 2. Start each microservice
+Namespace used:
 
-```bash
-# Terminal 1 - Auth
-cd backend/auth && npm install && npm start
+restauranty-km
+Deployments
+kubectl get deployments -n restauranty-km
 
-# Terminal 2 - Discounts
-cd backend/discounts && npm install && npm start
+Services deployed:
 
-# Terminal 3 - Items
-cd backend/items && npm install && npm start
+frontend
+auth
+items
+discounts
+mongo
+Ingress
 
-# Terminal 4 - Frontend
-cd client && npm install && npm start
-```
+NGINX Ingress routes external traffic to services.
 
-### 3. Start HAProxy
+kubectl get ingress -n restauranty-km
+Monitoring Stack
 
-```bash
-haproxy -f haproxy.cfg
-```
+Monitoring stack deployed using:
 
-Access the app at **http://localhost/**
+helm install monitoring prometheus-community/kube-prometheus-stack
+Components
+Prometheus
+Grafana
+Alertmanager
+Node Exporter
+HTTPS & Security
 
-## Environment Variables
+HTTPS enabled using:
 
-Each microservice uses the same set of environment variables (see `.env.example` in each service folder):
+cert-manager
+Let’s Encrypt
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `SECRET` | JWT signing key | `MySecret1!` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/restauranty` |
-| `CLOUD_NAME` | Cloudinary cloud name | _(ask instructor)_ |
-| `CLOUD_API_KEY` | Cloudinary API key | _(ask instructor)_ |
-| `CLOUD_API_SECRET` | Cloudinary API secret | _(ask instructor)_ |
-| `PORT` | Service port | `3001` / `3002` / `3003` |
+TLS certificates are automatically generated and renewed.
 
-For the frontend, use the `REACT_APP_` prefix: `REACT_APP_API_URL=http://localhost:80`
+Secure URL
+https://restauranty.kondal.online
+Docker Images
 
-## Tech Stack
+Images stored in Azure Container Registry:
 
-- **Frontend**: React 18, React Router 6, Tailwind CSS, Axios, React Icons
-- **Backend**: Express, Mongoose, JWT (jsonwebtoken + express-jwt), bcryptjs
-- **Image Storage**: Cloudinary (via multer-storage-cloudinary)
-- **Monitoring**: Prometheus metrics (`/metrics` endpoint on each backend service)
-- **Routing**: HAProxy (local) / Kubernetes Ingress (production)
-- **Database**: MongoDB
-# azure_Restauranty
+restaurantykm2468.azurecr.io
+Project Structure
+devops.restauranty/
+├── backend/
+│   ├── auth/
+│   ├── discounts/
+│   └── items/
+├── client/
+├── k8s/
+├── .github/workflows/
+└── README.md
+
+Future Improvements
+Horizontal Pod Autoscaler (HPA)
+Persistent Volumes for MongoDB
+ArgoCD GitOps deployment
+Terraform Infrastructure as Code
+Loki centralized logging
+Blue/Green deployments
+Key DevOps Concepts Demonstrated
+Cloud-native architecture
+Kubernetes orchestration
+CI/CD automation
+Containerized microservices
+Monitoring & observability
+HTTPS/TLS security
+Azure cloud deployment
+Author
+
+Kondaiah Moganti
+
+GitHub:
+
+https://github.com/kondalmoganti
